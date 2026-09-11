@@ -186,13 +186,17 @@ namespace MCP {
                     }
                 }
             }
-            if (Utils::IsDynamicForm(ref)) {
+            const bool isDynamicRef = Utils::IsDynamicForm(ref);
+            if (isDynamicRef) {
                 std::string text = TrStMCP::selected_ref + ": %08X" + TrStMCP::BOS_ignored;
                 ImGui::Text(text.c_str(), ref->GetFormID());
-            } else {
-                if (ImGui::CollapsingHeader(TrStMCP::BOS_support.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+            }
+
+            const char* transformHeader = isDynamicRef ?
+                "Live Transform (runtime reference)" : TrStMCP::BOS_support.c_str();
+            if (ImGui::CollapsingHeader(transformHeader, ImGuiTreeNodeFlags_DefaultOpen)) {
                     std::string headerText = TrStMCP::BOS_support + " " + TrStMCP::help;
-                    if (ImGui::CollapsingHeader(headerText.c_str())) {
+                    if (!isDynamicRef && ImGui::CollapsingHeader(headerText.c_str())) {
                         ImGui::TextWrapped(TrStMCP::BOS_support_help_text.c_str());
                     }
 
@@ -298,28 +302,40 @@ namespace MCP {
 
                     // Action buttons
 
-                    if (unsavedChanges) {
+                    if (unsavedChanges && !isDynamicRef) {
                         ImGui::TextColored(yellow, TrStMCP::unsaved_changes.c_str());
                     }
-                    if (ImGui::Button(TrStMCP::save_transform.c_str())) {
-                        unsavedChanges = false;
-                        BosMgr->TransformObject(ref);
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button(TrStMCP::remove_object.c_str())) {
-                        unsavedChanges = false;
-                        BosMgr->RemoveObject(ref);
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button(TrStMCP::reset_transform.c_str())) {
-                        unsavedChanges = false;
-                        BosMgr->ResetObject(ref);
-                    }
+                    if (isDynamicRef) {
+                        ImGui::TextWrapped(
+                            "This is a runtime-placed reference. Fine-tuning is applied live; "
+                            "BOS Save and Remove are unavailable for FF FormIDs.");
+                        if (ImGui::Button(TrStMCP::reset_transform.c_str())) {
+                            unsavedChanges = false;
+                            ref->SetPosition(originalPos);
+                            ref->data.angle = originalRot;
+                            ref->GetReferenceRuntimeData().refScale =
+                                static_cast<std::uint16_t>(originalScale * 100.0f);
+                        }
+                    } else {
+                        if (ImGui::Button(TrStMCP::save_transform.c_str())) {
+                            unsavedChanges = false;
+                            BosMgr->TransformObject(ref);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button(TrStMCP::remove_object.c_str())) {
+                            unsavedChanges = false;
+                            BosMgr->RemoveObject(ref);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button(TrStMCP::reset_transform.c_str())) {
+                            unsavedChanges = false;
+                            BosMgr->ResetObject(ref);
+                        }
 
-                    ImGui::BulletText(TrStMCP::save_BOS_text.c_str());
-                    ImGui::BulletText(TrStMCP::remove_BOS_text.c_str());
-                    ImGui::BulletText(TrStMCP::reset_transform.c_str());
-                }
+                        ImGui::BulletText(TrStMCP::save_BOS_text.c_str());
+                        ImGui::BulletText(TrStMCP::remove_BOS_text.c_str());
+                        ImGui::BulletText(TrStMCP::reset_transform.c_str());
+                    }
             }
         } else {
             ImGui::Text(TrStMCP::no_selected_ref.c_str());
