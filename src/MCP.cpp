@@ -46,6 +46,7 @@ namespace MCP {
         
         RE::TESObjectREFR* ref = nullptr;
         
+        // CommonLib selects the correct relocation for the active runtime.
         ref = RE::Console::GetSelectedRef().get();
 
         if (ref) {
@@ -298,13 +299,14 @@ namespace MCP {
 
                     if (changed) {
                         unsavedChanges = true;
-                        if (!SkyPlace::SetObjectTransform(ref, pos, rot, scale)) {
-                            ref->SetPosition(pos);
-                            ref->data.angle = rot;
-                            ref->SetScale(scale);
-                            if (ref->Is3DLoaded()) {
-                                ref->Update3DPosition(true);
-                            }
+                        // The fine-tune panel belongs to In-Game Patcher. Apply its
+                        // edits directly so they work independently of SkyPlace's
+                        // placement loop and for both persistent and FF references.
+                        ref->SetPosition(pos);
+                        ref->data.angle = rot;
+                        ref->SetScale(scale);
+                        if (ref->Is3DLoaded()) {
+                            ref->Update3DPosition(true);
                         }
                     }
 
@@ -321,8 +323,12 @@ namespace MCP {
                             "BOS Save and Remove are unavailable for FF FormIDs.");
                         if (ImGui::Button(TrStMCP::reset_transform.c_str())) {
                             unsavedChanges = false;
-                            SkyPlace::SetObjectTransform(
-                                ref, originalPos, originalRot, originalScale);
+                            ref->SetPosition(originalPos);
+                            ref->data.angle = originalRot;
+                            ref->SetScale(originalScale);
+                            if (ref->Is3DLoaded()) {
+                                ref->Update3DPosition(true);
+                            }
                         }
                     } else {
                         if (ImGui::Button(TrStMCP::save_transform.c_str())) {
