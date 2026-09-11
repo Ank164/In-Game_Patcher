@@ -41,13 +41,7 @@ namespace MCP {
         
         RE::TESObjectREFR* ref = nullptr;
         
-        // The following if-else is required because the address of GetSelectedRef function changes between AE
-        // vesions
-        if (Version.compare(REL::Version(1, 6, 1130)) == std::strong_ordering::less){
-            ref = RE::Console::GetSelectedRef640().get();  // AE offset: 405935
-        } else {
-            ref = RE::Console::GetSelectedRef().get(); // AE offset: 504099
-        }
+        ref = RE::Console::GetSelectedRef().get();
 
         if (ref) {
             if (ref->As<RE::Actor>()) {

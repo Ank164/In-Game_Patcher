@@ -41,9 +41,10 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
                         dragging = true;
                         logger::info("Started moving object with SkyPlace: {}", ref->GetName());
                     } else {
-                        RE::DebugNotification(SkyPlace_installed ?
-                                                  "SkyPlace could not move this object" :
-                                                  "SkyPlace with In-Game Patcher API support is not installed");
+                        RE::SendHUDMessage::ShowHUDMessage(
+                            SkyPlace_installed ?
+                                "SkyPlace could not move this object" :
+                                "SkyPlace with In-Game Patcher API support is not installed");
                         if (RE::NiAVObject* object3D = ref->Get3D()) {
                             object3D->TintScenegraph(RE::NiColorA(0, 1.0f, 0, 0.5f));
                         }

@@ -16,9 +16,9 @@ void RayCollector::AddRayHit(const RE::hkpCdBody& body, const RE::hkpShapeRayCas
     if (!hit.body) return;
 
     const auto collisionObj = static_cast<const RE::hkpCollidable*>(hit.body);
-    const auto flags = collisionObj->broadPhaseHandle.collisionFilterInfo;
+    const auto layer = collisionObj->broadPhaseHandle.collisionFilterInfo.GetCollisionLayer();
 
-    const uint64_t m = 1ULL << static_cast<uint64_t>(flags);
+    const uint64_t m = 1ULL << static_cast<uint64_t>(layer);
 
     //logger::info("Flags: {:x}", m);
 

@@ -64,10 +64,10 @@ RE::MagicTarget* FindPickTarget(RE::MagicCaster* caster, RE::NiPoint3& a_targetL
 
 std::pair<RE::NiPoint3, RE::NiPoint3> RayCast::GetCameraData() {
     RE::PlayerCamera* camera = RE::PlayerCamera::GetSingleton();
-    auto thirdPerson =
-        reinterpret_cast<RE::ThirdPersonState*>(camera->cameraStates[RE::CameraState::kThirdPerson].get());
-    auto firstPerson =
-        reinterpret_cast<RE::FirstPersonState*>(camera->cameraStates[RE::CameraState::kFirstPerson].get());
+    auto thirdPerson = reinterpret_cast<RE::ThirdPersonState*>(
+        camera->GetRuntimeData().cameraStates[RE::CameraState::kThirdPerson].get());
+    auto firstPerson = reinterpret_cast<RE::FirstPersonState*>(
+        camera->GetRuntimeData().cameraStates[RE::CameraState::kFirstPerson].get());
 
     RE::NiQuaternion rotation;
     RE::NiPoint3 translation;
@@ -109,7 +109,7 @@ std::pair<RE::NiPoint3, RE::TESObjectREFR*> RayCast::CastRay(
 
     auto collector = RayCollector(evaluator);
     collector.Reset();
-    pick_data.rayHitCollectorA8 = reinterpret_cast<RE::hkpClosestRayHitCollector*>(&collector);
+    pick_data.closestRayHitCollector = reinterpret_cast<RE::hkpClosestRayHitCollector*>(&collector);
 
     const auto ply = RE::PlayerCharacter::GetSingleton();
     if (!ply->parentCell) return {};

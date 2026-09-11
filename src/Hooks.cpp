@@ -63,13 +63,7 @@ namespace Hooks {
 
             RE::TESObjectREFR* consoleRef = nullptr;
 
-            // The following if-else is required because the address of GetSelectedRef function changes between AE
-            // versions.
-            if (Version.compare(REL::Version(1, 6, 1130)) == std::strong_ordering::less) {
-                consoleRef = RE::Console::GetSelectedRef640().get();  // AE offset: 405935
-            } else {
-                consoleRef = RE::Console::GetSelectedRef().get();  // AE offset: 504099
-            }
+            consoleRef = RE::Console::GetSelectedRef().get();
 
             // Priority: console ref > raycast ref
             RE::TESObjectREFR* currentRef = nullptr;
