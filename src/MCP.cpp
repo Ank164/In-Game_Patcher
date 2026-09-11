@@ -38,6 +38,11 @@ namespace MCP {
         ImGui::Separator();
 
         ImGui::Checkbox(TrStMCP::patching_mode.c_str(), &PatchingMode);
+
+        if (!PatchingMode) {
+            ImGui::TextDisabled("Enable Patching Mode to select, move, or fine-tune references.");
+            return;
+        }
         
         RE::TESObjectREFR* ref = nullptr;
         
