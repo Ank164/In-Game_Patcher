@@ -226,17 +226,25 @@ void BOSIniManager::RemoveObject(RE::TESObjectREFR* ref) {
      auto it = originalStates.find(id);
      if (it == originalStates.end()) {
          logger::warn("No original data stored for {}", id);
-     } else {
-         const auto& orig = it->second;
-         ref->SetPosition(orig.pos.x, orig.pos.y, orig.pos.z);
-         ref->data.angle = orig.rot;
-         ref->GetReferenceRuntimeData().refScale = static_cast<std::uint16_t>(orig.scale * 100.0f);
+         return;
+     }
+
+     const auto& orig = it->second;
+     ref->SetPosition(orig.pos);
+     ref->data.angle = orig.rot;
+     ref->SetScale(orig.scale);
+     if (ref->Is3DLoaded()) {
+         ref->Update3DPosition(true);
      }
 
      if (ref->IsDisabled()) {
          ref->Enable(false);
      }
-     RemoveTransform(ref);
+     // Runtime-created references have no stable BOS identity. Reset their
+     // live transform without attempting to edit the BOS file.
+     if (!Utils::IsDynamicForm(ref)) {
+         RemoveTransform(ref);
+     }
 
      logger::info("Reset object {} to original transform", ref->GetName());
  }

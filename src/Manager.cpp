@@ -116,11 +116,12 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
             if (event.prompt.actionID == 4) {
                 SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
                 auto ref = RE::TESForm::LookupByID<RE::TESObjectREFR>(event.prompt.refid);
-                if (dragging) {
+                if (dragging || SkyPlace::IsMovingObject()) {
                     SkyPlace::CancelMovingObject();
                     dragging = false;
-                    logger::info("Cancelled movement with Reset Position");
-                } else if (ref) {
+                    logger::info("Cancelled movement before Reset Position");
+                }
+                if (ref) {
                     BOSIniManager::GetSingleton()->ResetObject(ref);
                 }
                 if (!SkyPromptAPI::SendPrompt(PatcherPromptSink::GetSingleton(), clientID)) {
