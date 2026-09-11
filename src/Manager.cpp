@@ -105,8 +105,12 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
     } else if (event.type == SkyPromptAPI::PromptEventType::kDeclined) {
         SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
     } else if (event.type == SkyPromptAPI::PromptEventType::kTimingOut) {
-        if (!SkyPromptAPI::SendPrompt(PatcherPromptSink::GetSingleton(), clientID)) {
-            logger::error("Failed to send prompt to SkyPrompt on timeout");
+        if (console || (PatchingMode && !dragging)) {
+            if (!SkyPromptAPI::SendPrompt(PatcherPromptSink::GetSingleton(), clientID)) {
+                logger::error("Failed to send prompt to SkyPrompt on timeout");
+            }
+        } else {
+            SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
         }
     }
 }

@@ -28,6 +28,7 @@ namespace Hooks {
         Update_(a_this, a_delta);
 
         static RE::TESObjectREFR* previousObject = nullptr;
+        static bool wasPatchingMode = false;
 
         auto patcherPrompt = PatcherPromptSink::GetSingleton();
         if (SkyPlace_installed && SkyPlace::IsMovingObject()) {
@@ -43,6 +44,10 @@ namespace Hooks {
         }
 
         if (!PatchingMode) {
+            if (wasPatchingMode) {
+                SkyPromptAPI::RemovePrompt(patcherPrompt, patcherPrompt->clientID);
+            }
+            wasPatchingMode = false;
             if (previousObject) {
                 // Reset old object's tint
                 if (auto obj3d = previousObject->Get3D()) {
@@ -53,6 +58,7 @@ namespace Hooks {
             previousObject = nullptr;
             return;
         }
+        wasPatchingMode = true;
 
         if (a_this && a_this->IsPlayerRef()) {
             auto player3d = GetPlayer3d();
@@ -71,7 +77,7 @@ namespace Hooks {
             // Priority: console ref > raycast ref
             RE::TESObjectREFR* currentRef = nullptr;
 
-            if (consoleRef && !Utils::IsDynamicForm(consoleRef)) {
+            if (consoleRef) {
                 currentRef = consoleRef;
                 if (auto obj3d = currentRef->Get3D()) {
                     static auto color = RE::NiColorA(0, 1.0f, 0, 0.5f);
@@ -79,7 +85,7 @@ namespace Hooks {
                 }
             } else {
                 auto result = RayCast::Cast(evaluator);
-                if (result.object && !Utils::IsDynamicForm(result.object)) {
+                if (result.object) {
                     currentRef = result.object;
                     if (auto obj3d = currentRef->Get3D()) {
                         static auto color = RE::NiColorA(0, 1.0f, 0, 0.5f);
