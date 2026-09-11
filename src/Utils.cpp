@@ -7,6 +7,8 @@ namespace SkyPlace {
         using MoveObject_t = void (*)(const RE::ObjectRefHandle&);
         using IsMovingObject_t = bool (*)();
         using MovementAction_t = void (*)();
+        using SetObjectTransform_t = bool (*)(const RE::ObjectRefHandle&, const RE::NiPoint3&,
+                                              const RE::NiPoint3&, float);
 
         REX::W32::HMODULE GetModule() {
             return REX::W32::GetModuleHandle(L"SkyPlace");
@@ -61,6 +63,16 @@ namespace SkyPlace {
             action();
         }
         return action != nullptr;
+    }
+
+    bool SetObjectTransform(RE::TESObjectREFR* ref, const RE::NiPoint3& position,
+                            const RE::NiPoint3& angle, float scale) {
+        if (!ref) {
+            return false;
+        }
+        const auto setTransform =
+            GetFunction<SetObjectTransform_t>(GetModule(), "SetObjectTransform");
+        return setTransform && setTransform(ref->GetHandle(), position, angle, scale);
     }
 }
 

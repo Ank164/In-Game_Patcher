@@ -293,9 +293,14 @@ namespace MCP {
 
                     if (changed) {
                         unsavedChanges = true;
-                        ref->SetPosition(pos);
-                        ref->data.angle = rot;
-                        ref->GetReferenceRuntimeData().refScale = static_cast<std::uint16_t>(scale * 100.0f);
+                        if (!SkyPlace::SetObjectTransform(ref, pos, rot, scale)) {
+                            ref->SetPosition(pos);
+                            ref->data.angle = rot;
+                            ref->SetScale(scale);
+                            if (ref->Is3DLoaded()) {
+                                ref->Update3DPosition(true);
+                            }
+                        }
                     }
 
                     ImGui::Separator();
@@ -311,10 +316,8 @@ namespace MCP {
                             "BOS Save and Remove are unavailable for FF FormIDs.");
                         if (ImGui::Button(TrStMCP::reset_transform.c_str())) {
                             unsavedChanges = false;
-                            ref->SetPosition(originalPos);
-                            ref->data.angle = originalRot;
-                            ref->GetReferenceRuntimeData().refScale =
-                                static_cast<std::uint16_t>(originalScale * 100.0f);
+                            SkyPlace::SetObjectTransform(
+                                ref, originalPos, originalRot, originalScale);
                         }
                     } else {
                         if (ImGui::Button(TrStMCP::save_transform.c_str())) {

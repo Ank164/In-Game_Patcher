@@ -41,6 +41,8 @@ namespace SkyPlace {
     bool IsMovingObject();
     bool PlaceMovingObject();
     bool CancelMovingObject();
+    bool SetObjectTransform(RE::TESObjectREFR* ref, const RE::NiPoint3& position,
+                            const RE::NiPoint3& angle, float scale);
 }
 
 namespace Utils {
