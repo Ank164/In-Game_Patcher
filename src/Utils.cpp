@@ -6,6 +6,7 @@ namespace SkyPlace {
     namespace {
         using MoveObject_t = void (*)(const RE::ObjectRefHandle&);
         using IsMovingObject_t = bool (*)();
+        using MovementAction_t = void (*)();
 
         REX::W32::HMODULE GetModule() {
             return REX::W32::GetModuleHandle(L"SkyPlace");
@@ -44,6 +45,22 @@ namespace SkyPlace {
         const REX::W32::HMODULE module = GetModule();
         const IsMovingObject_t isMovingObject = GetFunction<IsMovingObject_t>(module, "IsMovingObject");
         return isMovingObject && isMovingObject();
+    }
+
+    bool PlaceMovingObject() {
+        const auto action = GetFunction<MovementAction_t>(GetModule(), "PlaceMovingObject");
+        if (action) {
+            action();
+        }
+        return action != nullptr;
+    }
+
+    bool CancelMovingObject() {
+        const auto action = GetFunction<MovementAction_t>(GetModule(), "CancelMovingObject");
+        if (action) {
+            action();
+        }
+        return action != nullptr;
     }
 }
 

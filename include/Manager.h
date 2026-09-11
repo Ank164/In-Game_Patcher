@@ -17,6 +17,7 @@ public:
     std::array<SkyPromptAPI::Prompt, 4> PatcherPrompts;
     std::array<SkyPromptAPI::Prompt, 1> EnterPrompt;
     std::array<SkyPromptAPI::Prompt, 1> ExitPrompt;
+    std::array<SkyPromptAPI::Prompt, 2> MovePrompts;
 
     SkyPromptAPI::ClientID clientID = 0;
     mutable bool console = false;

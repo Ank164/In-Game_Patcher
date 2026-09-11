@@ -39,6 +39,8 @@ namespace SkyPlace {
     bool IsAvailable();
     bool MoveObject(RE::TESObjectREFR* ref);
     bool IsMovingObject();
+    bool PlaceMovingObject();
+    bool CancelMovingObject();
 }
 
 namespace Utils {

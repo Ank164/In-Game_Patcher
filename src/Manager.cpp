@@ -23,12 +23,25 @@ std::span<const SkyPromptAPI::Prompt> PatcherPromptSink::GetPrompts() const {
             return EnterPrompt;
         }
     }
+    if (dragging) {
+        return MovePrompts;
+    }
     return PatcherPrompts;
 }
 
 void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
     if (event.type == SkyPromptAPI::PromptEventType::kAccepted) {
-        if (event.prompt.eventID == 1) {
+        if (event.prompt.eventID == 10 && event.prompt.actionID == 10) {
+            SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
+            SkyPlace::PlaceMovingObject();
+            dragging = false;
+            logger::info("Committed SkyPlace movement through In-Game Patcher");
+        } else if (event.prompt.eventID == 11 && event.prompt.actionID == 11) {
+            SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
+            SkyPlace::CancelMovingObject();
+            dragging = false;
+            logger::info("Cancelled SkyPlace movement through In-Game Patcher");
+        } else if (event.prompt.eventID == 1) {
             if (event.prompt.actionID == 1) {
                 auto ref = RE::TESForm::LookupByID<RE::TESObjectREFR>(event.prompt.refid);
                 if (ref) {
@@ -40,6 +53,13 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
                     if (SkyPlace_installed && SkyPlace::MoveObject(ref)) {
                         dragging = true;
                         logger::info("Started moving object with SkyPlace: {}", ref->GetName());
+                        if (const SKSE::TaskInterface* tasks = SKSE::GetTaskInterface()) {
+                            tasks->AddTask([this]() {
+                                if (!SkyPromptAPI::SendPrompt(this, clientID)) {
+                                    logger::error("Failed to show In-Game Patcher movement controls");
+                                }
+                            });
+                        }
                     } else {
                         RE::SendHUDMessage::ShowHUDMessage(
                             SkyPlace_installed ?
@@ -131,5 +151,13 @@ void PatcherPromptSink::InitPrompts() {
                       SkyPromptAPI::Prompt(TrStSkPr::remove, 2, 2, SkyPromptAPI::PromptType::kHold),
                       SkyPromptAPI::Prompt(TrStSkPr::save, 3, 3, SkyPromptAPI::PromptType::kHold),
                       SkyPromptAPI::Prompt(TrStSkPr::reset, 4, 4, SkyPromptAPI::PromptType::kHold)};
+
+    static const std::vector<std::pair<RE::INPUT_DEVICE, SkyPromptAPI::ButtonID>> acceptKey{
+        {RE::INPUT_DEVICE::kMouse, 0x00}};
+    static const std::vector<std::pair<RE::INPUT_DEVICE, SkyPromptAPI::ButtonID>> cancelKey{
+        {RE::INPUT_DEVICE::kMouse, 0x01}};
+    MovePrompts = {
+        SkyPromptAPI::Prompt(TrStSkPr::accept, 10, 10, SkyPromptAPI::PromptType::kSinglePress, 0, acceptKey),
+        SkyPromptAPI::Prompt(TrStSkPr::cancel, 11, 11, SkyPromptAPI::PromptType::kSinglePress, 0, cancelKey)};
 
 }
