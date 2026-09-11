@@ -30,11 +30,14 @@ namespace Hooks {
         static RE::TESObjectREFR* previousObject = nullptr;
 
         auto patcherPrompt = PatcherPromptSink::GetSingleton();
-        if (patcherPrompt->dragging) {
-            if (SkyPlace::IsMovingObject()) {
-                return;
-            }
+        if (SkyPlace_installed && SkyPlace::IsMovingObject()) {
+            // SkyPlace owns input and prompts for the entire placement session,
+            // regardless of whether it was entered directly or through IGP.
+            patcherPrompt->dragging = true;
+            return;
+        }
 
+        if (patcherPrompt->dragging) {
             patcherPrompt->dragging = false;
             previousObject = nullptr;
         }
