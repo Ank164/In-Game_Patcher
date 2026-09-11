@@ -241,7 +241,9 @@ namespace MCP {
                     std::string posLabel = TrStMCP::position + " | " + TrStMCP::step + ": ";
                     ImGui::Text(posLabel.c_str());
                     ImGui::SameLine();
-                    ImGui::InputFloat("", &posStepValue, 1.0f, 10.0f, "%.3f");
+                    if (ImGui::InputFloat("##livePosStep", &posStepValue, 1.0f, 10.0f, "%.3f")) {
+                        posStepValue = std::max(std::abs(posStepValue), 0.001f);
+                    }
 
                     color = (std::abs(pos.x - originalPos.x) < 0.001f) ? green : yellow;
                     ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
@@ -266,7 +268,9 @@ namespace MCP {
                     std::string rotLabel = TrStMCP::rotation + " | " + TrStMCP::step + ": ";
                     ImGui::Text(rotLabel.c_str());
                     ImGui::SameLine();
-                    ImGui::InputFloat("", &rotStepValue, 0.1f, 1.0f, "%.3f");
+                    if (ImGui::InputFloat("##liveRotStep", &rotStepValue, 0.1f, 1.0f, "%.3f")) {
+                        rotStepValue = std::max(std::abs(rotStepValue), 0.001f);
+                    }
 
                     color = (std::abs(rot.x - originalRot.x) < 0.001f) ? green : yellow;
                     ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
@@ -291,7 +295,9 @@ namespace MCP {
                     std::string scaleLabel = TrStMCP::scale + " | " + TrStMCP::step + ": ";
                     ImGui::Text(scaleLabel.c_str());
                     ImGui::SameLine();
-                    ImGui::InputFloat("", &scaleStepValue, 0.1f, 1.0f, "%.3f");
+                    if (ImGui::InputFloat("##liveScaleStep", &scaleStepValue, 0.1f, 1.0f, "%.3f")) {
+                        scaleStepValue = std::max(std::abs(scaleStepValue), 0.001f);
+                    }
 
                     color = (std::abs(scale - originalScale) < 0.001f) ? green : yellow;
                     ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
@@ -495,7 +501,9 @@ namespace MCP {
                     std::string posLabel = TrStMCP::position + " | " + TrStMCP::step + ": ";
                     ImGui::Text(posLabel.c_str());
                     ImGui::SameLine();
-                    ImGui::InputFloat("", &posStepValue, 1.0f, 10.0f, "%.3f");
+                    if (ImGui::InputFloat("##resolverPosStep", &posStepValue, 1.0f, 10.0f, "%.3f")) {
+                        posStepValue = std::max(std::abs(posStepValue), 0.001f);
+                    }
 
                     color = (std::abs(overrides.pos[0] - originalPos.x) < 0.001f) ? green : yellow;
                     ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
@@ -526,7 +534,9 @@ namespace MCP {
                     std::string rotLabel = TrStMCP::rotation + " | " + TrStMCP::step + ": ";
                     ImGui::Text(rotLabel.c_str());
                     ImGui::SameLine();
-                    ImGui::InputFloat("", &rotStepValue, 0.1f, 1.0f, "%.3f");
+                    if (ImGui::InputFloat("##resolverRotStep", &rotStepValue, 0.1f, 1.0f, "%.3f")) {
+                        rotStepValue = std::max(std::abs(rotStepValue), 0.001f);
+                    }
                     color = (std::abs(overrides.rot[0] - originalRot.x) < 0.001f) ? green : yellow;
                     ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
                     if (ImGui::InputFloat("X##rot", &overrides.rot[0], rotStepValue, rotStepValue * 10)) {
@@ -554,7 +564,9 @@ namespace MCP {
                     std::string scaleLabel = TrStMCP::scale + " | " + TrStMCP::step + ": ";
                     ImGui::Text(scaleLabel.c_str());
                     ImGui::SameLine();
-                    ImGui::InputFloat("", &scaleStepValue, 0.1f, 1.0f, "%.3f");
+                    if (ImGui::InputFloat("##resolverScaleStep", &scaleStepValue, 0.1f, 1.0f, "%.3f")) {
+                        scaleStepValue = std::max(std::abs(scaleStepValue), 0.001f);
+                    }
                     color = (std::abs(overrides.scale - originalScale) < 0.001f) ? green : yellow;
                     ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
                     if (ImGui::InputFloat("##scale", &overrides.scale, scaleStepValue, scaleStepValue * 10)) {
