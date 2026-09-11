@@ -29,8 +29,14 @@ namespace Hooks {
 
         static RE::TESObjectREFR* previousObject = nullptr;
 
-        if (PatcherPromptSink::GetSingleton()->dragging) {
-            return;
+        auto patcherPrompt = PatcherPromptSink::GetSingleton();
+        if (patcherPrompt->dragging) {
+            if (SkyPlace::IsMovingObject()) {
+                return;
+            }
+
+            patcherPrompt->dragging = false;
+            previousObject = nullptr;
         }
 
         if (!PatchingMode) {

@@ -24,3 +24,12 @@
 Automatically imports:
 - [CLibUtil](https://github.com/powerof3/CLibUtil) by powerof3
 - [SKSE Menu Framework](https://www.nexusmods.com/skyrimspecialedition/mods/120352) by Thiago099
+
+#### RUNTIME REQUIREMENTS
+
+- SkyPlace, built with the `IsMovingObject` API export included in this workspace.
+- SkyPrompt.
+
+Object movement is delegated to SkyPlace. In-Game Patcher pauses its own targeting while SkyPlace is
+moving an object and resumes after SkyPlace finishes or cancels placement. Object Manipulation Overhaul
+and its key configuration are no longer used.

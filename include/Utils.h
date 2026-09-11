@@ -3,12 +3,9 @@
 #include "SkyPrompt/API.hpp"
 
 inline REL::Version Version;
-inline bool OMO_installed = false;
+inline bool SkyPlace_installed = false;
 inline bool PatchingMode = false;
 
-using KeyBinding = std::pair<RE::INPUT_DEVICE, SkyPromptAPI::ButtonID>;
-using ActionMap = std::unordered_map<std::string, std::vector<KeyBinding>>;
-inline ActionMap OMO_action_bindings;
 
 struct OverridesData {
     bool hasPos = false;
@@ -38,15 +35,10 @@ struct KIDEntry {
     std::string objectID;
 };
 
-namespace ObjectManipulationOverhaul {
-    inline void StartDraggingObject(RE::TESObjectREFR* ref) {
-        using func_t = void (*)(RE::TESObjectREFR*);
-        static auto ObjectManipulationOverhaul = GetModuleHandle(L"ObjectManipulationOverhaul");
-        if (ObjectManipulationOverhaul) {
-            func_t func = reinterpret_cast<func_t>(GetProcAddress(ObjectManipulationOverhaul, "StartDraggingObject"));
-            return func(ref);
-        }
-    }
+namespace SkyPlace {
+    bool IsAvailable();
+    bool MoveObject(RE::TESObjectREFR* ref);
+    bool IsMovingObject();
 }
 
 namespace Utils {
@@ -71,5 +63,4 @@ namespace Utils {
 
     bool IsPluginLoaded(const std::string& pluginName);
 
-    void LoadKeyConfig(const std::string& filePath);
 }

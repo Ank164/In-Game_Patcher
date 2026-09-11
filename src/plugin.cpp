@@ -15,11 +15,11 @@ void OnMessage(SKSE::MessagingInterface::Message* message) {
 
         const auto lang = Translations::GetValidLanguage();
         Translations::LoadTranslations(lang);
-        if (REX::W32::GetModuleHandle(L"ObjectManipulationOverhaul")) {
-            OMO_installed = true;
-            Utils::LoadKeyConfig("Data\\Object Manipulation Overhaul\\KeyConfiguration.txt");
+        if (SkyPlace::IsAvailable()) {
+            SkyPlace_installed = true;
+            logger::info("SkyPlace API is available");
         } else {
-            logger::info("Object Manipulation Overhaul is not installed");
+            logger::info("SkyPlace with IsMovingObject API support is not installed");
         }
         Hooks::Install();
         EventSinks::Install();
