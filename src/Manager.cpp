@@ -31,12 +31,12 @@ std::span<const SkyPromptAPI::Prompt> PatcherPromptSink::GetPrompts() const {
 
 void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
     if (event.type == SkyPromptAPI::PromptEventType::kAccepted) {
-        if (event.prompt.eventID == 10 && event.prompt.actionID == 10) {
+        if (event.prompt.eventID == 10 && event.prompt.actionID == 1) {
             SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
             SkyPlace::PlaceMovingObject();
             dragging = false;
             logger::info("Committed SkyPlace movement through In-Game Patcher");
-        } else if (event.prompt.eventID == 11 && event.prompt.actionID == 11) {
+        } else if (event.prompt.eventID == 11 && event.prompt.actionID == 2) {
             SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
             SkyPlace::CancelMovingObject();
             dragging = false;
@@ -152,12 +152,8 @@ void PatcherPromptSink::InitPrompts() {
                       SkyPromptAPI::Prompt(TrStSkPr::save, 3, 3, SkyPromptAPI::PromptType::kHold),
                       SkyPromptAPI::Prompt(TrStSkPr::reset, 4, 4, SkyPromptAPI::PromptType::kHold)};
 
-    static const std::vector<std::pair<RE::INPUT_DEVICE, SkyPromptAPI::ButtonID>> acceptKey{
-        {RE::INPUT_DEVICE::kMouse, 0x00}};
-    static const std::vector<std::pair<RE::INPUT_DEVICE, SkyPromptAPI::ButtonID>> cancelKey{
-        {RE::INPUT_DEVICE::kMouse, 0x01}};
     MovePrompts = {
-        SkyPromptAPI::Prompt(TrStSkPr::accept, 10, 10, SkyPromptAPI::PromptType::kHint, 0, acceptKey),
-        SkyPromptAPI::Prompt(TrStSkPr::cancel, 11, 11, SkyPromptAPI::PromptType::kHint, 0, cancelKey)};
+        SkyPromptAPI::Prompt(TrStSkPr::accept, 10, 1, SkyPromptAPI::PromptType::kHold),
+        SkyPromptAPI::Prompt(TrStSkPr::cancel, 11, 2, SkyPromptAPI::PromptType::kHold)};
 
 }
