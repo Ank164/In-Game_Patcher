@@ -23,25 +23,12 @@ std::span<const SkyPromptAPI::Prompt> PatcherPromptSink::GetPrompts() const {
             return EnterPrompt;
         }
     }
-    if (dragging) {
-        return MovePrompts;
-    }
     return PatcherPrompts;
 }
 
 void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
     if (event.type == SkyPromptAPI::PromptEventType::kAccepted) {
-        if (event.prompt.eventID == 10 && event.prompt.actionID == 1) {
-            SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
-            SkyPlace::PlaceMovingObject();
-            dragging = false;
-            logger::info("Committed SkyPlace movement through In-Game Patcher");
-        } else if (event.prompt.eventID == 11 && event.prompt.actionID == 2) {
-            SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
-            SkyPlace::CancelMovingObject();
-            dragging = false;
-            logger::info("Cancelled SkyPlace movement through In-Game Patcher");
-        } else if (event.prompt.eventID == 1) {
+        if (event.prompt.eventID == 1) {
             if (event.prompt.actionID == 1) {
                 auto ref = RE::TESForm::LookupByID<RE::TESObjectREFR>(event.prompt.refid);
                 if (ref) {
@@ -92,6 +79,10 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
         else if (event.prompt.eventID == 2) {
              if (event.prompt.actionID == 2) {
                 auto ref = RE::TESForm::LookupByID<RE::TESObjectREFR>(event.prompt.refid);
+                 if (dragging) {
+                     SkyPlace::CancelMovingObject();
+                     dragging = false;
+                 }
                  if (ref) {
                      BOSIniManager::GetSingleton()->RememberOriginal(ref);
                      BOSIniManager::GetSingleton()->RemoveObject(ref);
@@ -103,8 +94,15 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
             if (event.prompt.actionID == 3) {
                 SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
                 auto ref = RE::TESForm::LookupByID<RE::TESObjectREFR>(event.prompt.refid);
+                if (dragging) {
+                    SkyPlace::PlaceMovingObject();
+                    dragging = false;
+                    logger::info("Committed movement with Save Position");
+                }
                 if (ref) {
-                    BOSIniManager::GetSingleton()->TransformObject(ref);
+                    if (!Utils::IsDynamicForm(ref)) {
+                        BOSIniManager::GetSingleton()->TransformObject(ref);
+                    }
                 }
                 if (!SkyPromptAPI::SendPrompt(PatcherPromptSink::GetSingleton(), clientID)) {
                     logger::error("Failed to send prompt to SkyPrompt after saving object");
@@ -114,7 +112,11 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
             if (event.prompt.actionID == 4) {
                 SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
                 auto ref = RE::TESForm::LookupByID<RE::TESObjectREFR>(event.prompt.refid);
-                if (ref) {
+                if (dragging) {
+                    SkyPlace::CancelMovingObject();
+                    dragging = false;
+                    logger::info("Cancelled movement with Reset Position");
+                } else if (ref) {
                     BOSIniManager::GetSingleton()->ResetObject(ref);
                 }
                 if (!SkyPromptAPI::SendPrompt(PatcherPromptSink::GetSingleton(), clientID)) {
@@ -125,7 +127,7 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
     } else if (event.type == SkyPromptAPI::PromptEventType::kDeclined) {
         SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
     } else if (event.type == SkyPromptAPI::PromptEventType::kTimingOut) {
-        if (console || (PatchingMode && !dragging)) {
+        if (console || PatchingMode) {
             if (!SkyPromptAPI::SendPrompt(PatcherPromptSink::GetSingleton(), clientID)) {
                 logger::error("Failed to send prompt to SkyPrompt on timeout");
             }
@@ -151,9 +153,5 @@ void PatcherPromptSink::InitPrompts() {
                       SkyPromptAPI::Prompt(TrStSkPr::remove, 2, 2, SkyPromptAPI::PromptType::kHold),
                       SkyPromptAPI::Prompt(TrStSkPr::save, 3, 3, SkyPromptAPI::PromptType::kHold),
                       SkyPromptAPI::Prompt(TrStSkPr::reset, 4, 4, SkyPromptAPI::PromptType::kHold)};
-
-    MovePrompts = {
-        SkyPromptAPI::Prompt(TrStSkPr::accept, 10, 1, SkyPromptAPI::PromptType::kHold),
-        SkyPromptAPI::Prompt(TrStSkPr::cancel, 11, 2, SkyPromptAPI::PromptType::kHold)};
 
 }
