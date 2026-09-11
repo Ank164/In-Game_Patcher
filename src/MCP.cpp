@@ -48,6 +48,9 @@ namespace MCP {
         
         // CommonLib selects the correct relocation for the active runtime.
         ref = RE::Console::GetSelectedRef().get();
+        if (!ref) {
+            ref = PatcherSelectedRef.get().get();
+        }
 
         if (ref) {
             if (ref->As<RE::Actor>()) {

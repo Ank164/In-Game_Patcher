@@ -31,20 +31,10 @@ namespace Hooks {
         static bool wasPatchingMode = false;
 
         auto patcherPrompt = PatcherPromptSink::GetSingleton();
-        if (SkyPlace_installed && SkyPlace::IsMovingObject()) {
-            // SkyPlace owns input and prompts for the entire placement session,
-            // regardless of whether it was entered directly or through IGP.
-            patcherPrompt->dragging = true;
-            return;
-        }
-
-        if (patcherPrompt->dragging) {
-            SkyPromptAPI::RemovePrompt(patcherPrompt, patcherPrompt->clientID);
-            patcherPrompt->dragging = false;
-            previousObject = nullptr;
-        }
-
         if (!PatchingMode) {
+            if (SkyPlace_installed && SkyPlace::IsMovingObject()) {
+                SkyPlace::CancelMovingObject();
+            }
             if (wasPatchingMode) {
                 SkyPromptAPI::RemovePrompt(patcherPrompt, patcherPrompt->clientID);
             }
@@ -57,9 +47,24 @@ namespace Hooks {
                 }
             }
             previousObject = nullptr;
+            patcherPrompt->dragging = false;
+            patcherPrompt->SetRef(nullptr);
             return;
         }
         wasPatchingMode = true;
+
+        if (SkyPlace_installed && SkyPlace::IsMovingObject()) {
+            // The move was initiated by IGP and its four-button prompt remains
+            // authoritative until Save Position or Reset Position is held.
+            patcherPrompt->dragging = true;
+            return;
+        }
+
+        if (patcherPrompt->dragging) {
+            SkyPromptAPI::RemovePrompt(patcherPrompt, patcherPrompt->clientID);
+            patcherPrompt->dragging = false;
+            previousObject = nullptr;
+        }
 
         if (a_this && a_this->IsPlayerRef()) {
             auto player3d = GetPlayer3d();

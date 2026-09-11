@@ -30,6 +30,10 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
     if (event.type == SkyPromptAPI::PromptEventType::kAccepted) {
         if (event.prompt.eventID == 1) {
             if (event.prompt.actionID == 1) {
+                if (!PatchingMode) {
+                    logger::warn("Ignored Move prompt while Patching Mode is disabled");
+                    return;
+                }
                 auto ref = RE::TESForm::LookupByID<RE::TESObjectREFR>(event.prompt.refid);
                 if (ref) {
                     SkyPromptAPI::RemovePrompt(PatcherPromptSink::GetSingleton(), clientID);
@@ -138,6 +142,10 @@ void PatcherPromptSink::ProcessEvent(SkyPromptAPI::PromptEvent event) const {
 }
 
 void PatcherPromptSink::SetRef(RE::TESObjectREFR* ref) {
+    PatcherSelectedRef = ref ? ref->GetHandle() : RE::ObjectRefHandle{};
+    if (!ref) {
+        return;
+    }
     auto formID = ref->GetFormID();
     PatcherPrompts = {SkyPromptAPI::Prompt(TrStSkPr::move, 1, 1, SkyPromptAPI::PromptType::kHold, formID),
                       SkyPromptAPI::Prompt(TrStSkPr::remove, 2, 2, SkyPromptAPI::PromptType::kHold, formID),

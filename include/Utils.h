@@ -5,6 +5,7 @@
 inline REL::Version Version;
 inline bool SkyPlace_installed = false;
 inline bool PatchingMode = false;
+inline RE::ObjectRefHandle PatcherSelectedRef;
 
 
 struct OverridesData {
