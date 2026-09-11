@@ -157,7 +157,7 @@ void PatcherPromptSink::InitPrompts() {
     static const std::vector<std::pair<RE::INPUT_DEVICE, SkyPromptAPI::ButtonID>> cancelKey{
         {RE::INPUT_DEVICE::kMouse, 0x01}};
     MovePrompts = {
-        SkyPromptAPI::Prompt(TrStSkPr::accept, 10, 10, SkyPromptAPI::PromptType::kSinglePress, 0, acceptKey),
-        SkyPromptAPI::Prompt(TrStSkPr::cancel, 11, 11, SkyPromptAPI::PromptType::kSinglePress, 0, cancelKey)};
+        SkyPromptAPI::Prompt(TrStSkPr::accept, 10, 10, SkyPromptAPI::PromptType::kHint, 0, acceptKey),
+        SkyPromptAPI::Prompt(TrStSkPr::cancel, 11, 11, SkyPromptAPI::PromptType::kHint, 0, cancelKey)};
 
 }

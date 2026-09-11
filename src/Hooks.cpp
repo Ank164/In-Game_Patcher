@@ -39,6 +39,7 @@ namespace Hooks {
         }
 
         if (patcherPrompt->dragging) {
+            SkyPromptAPI::RemovePrompt(patcherPrompt, patcherPrompt->clientID);
             patcherPrompt->dragging = false;
             previousObject = nullptr;
         }
